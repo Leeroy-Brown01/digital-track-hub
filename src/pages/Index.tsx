@@ -50,49 +50,49 @@ const Index = () => {
       {/* Features Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
+          <Card className="bg-slate text-white border-slate/20 hover:scale-105 transition-all duration-300 hover:shadow-lg">
             <CardHeader>
-              <FileText className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Digital Submissions</CardTitle>
+              <FileText className="h-8 w-8 text-cream mb-2" />
+              <CardTitle className="text-cream">Digital Submissions</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription>
+              <CardDescription className="text-cream/80">
                 Replace physical and email applications with a centralized digital platform
               </CardDescription>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-terracotta text-white border-terracotta/20 hover:scale-105 transition-all duration-300 hover:shadow-lg">
             <CardHeader>
-              <Users className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Efficient Reviews</CardTitle>
+              <Users className="h-8 w-8 text-cream mb-2" />
+              <CardTitle className="text-cream">Efficient Reviews</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription>
+              <CardDescription className="text-cream/80">
                 Enable internal teams to review and provide structured feedback efficiently
               </CardDescription>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-cream text-slate border-cream/20 hover:scale-105 transition-all duration-300 hover:shadow-lg">
             <CardHeader>
-              <Shield className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Secure & Auditable</CardTitle>
+              <Shield className="h-8 w-8 text-terracotta mb-2" />
+              <CardTitle className="text-slate">Secure & Auditable</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription>
+              <CardDescription className="text-slate/70">
                 Proper document tracking, access control and comprehensive audit trails
               </CardDescription>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-slate to-terracotta text-white border-slate/20 hover:scale-105 transition-all duration-300 hover:shadow-lg">
             <CardHeader>
-              <Clock className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Real-time Updates</CardTitle>
+              <Clock className="h-8 w-8 text-cream mb-2" />
+              <CardTitle className="text-cream">Real-time Updates</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription>
+              <CardDescription className="text-cream/80">
                 Live status updates and notifications for all stakeholders throughout the process
               </CardDescription>
             </CardContent>

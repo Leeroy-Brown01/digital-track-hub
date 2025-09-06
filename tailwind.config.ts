@@ -14,6 +14,11 @@ export default {
     },
     extend: {
       colors: {
+        // Custom brand colors
+        slate: "hsl(var(--slate))",
+        cream: "hsl(var(--cream))",
+        terracotta: "hsl(var(--terracotta))",
+        
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

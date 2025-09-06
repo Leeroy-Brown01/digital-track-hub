@@ -8,6 +8,11 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Custom brand colors */
+    --slate: 200 11% 29%;          /* #3E4E50 */
+    --cream: 44 30% 94%;           /* #F4F1ED */
+    --terracotta: 14 67% 63%;      /* #E27D60 */
+    
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
