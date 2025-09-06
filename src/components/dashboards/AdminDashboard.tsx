@@ -5,12 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck } from 'lucide-react';
+import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, Enums } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import ApplicationDetailsModal from '@/components/applications/ApplicationDetailsModal';
+import UserEditModal from '@/components/admin/UserEditModal';
 
 type Application = Tables<'applications'> & {
   profiles?: { full_name: string } | null;
@@ -23,6 +24,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [reviewers, setReviewers] = useState<Profile[]>([]);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+  const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -148,6 +150,54 @@ export default function AdminDashboard() {
       toast({
         title: "Error",
         description: "Failed to update user role",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      await fetchUsers();
+      toast({
+        title: "Success",
+        description: "User deleted successfully"
+      });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete user",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteApplication = async (applicationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      await fetchApplications();
+      toast({
+        title: "Success",
+        description: "Application deleted successfully"
+      });
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete application",
         variant: "destructive"
       });
     }
@@ -362,15 +412,25 @@ export default function AdminDashboard() {
                         </Select>
                       </div>
                       
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedApplication(application)}
-                        className="flex items-center gap-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View Details
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedApplication(application)}
+                          className="flex items-center gap-2"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View Details
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteApplication(application.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -379,43 +439,75 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="users" className="space-y-4">
-            <div className="space-y-4">
-              {users.map((user) => (
-                <Card key={user.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{user.full_name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Joined: {new Date(user.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2">
-                      <Select
-                        value={user.role}
-                        onValueChange={(value) => updateUserRole(user.user_id, value as Enums<'app_role'>)}
-                      >
-                        <SelectTrigger className="w-40">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="applicant">Applicant</SelectItem>
-                          <SelectItem value="reviewer">Reviewer</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {/* Users by Role */}
+            {['admin', 'reviewer', 'applicant'].map((role) => {
+              const roleUsers = users.filter(user => user.role === role);
+              if (roleUsers.length === 0) return null;
+              
+              return (
+                <div key={role} className="space-y-3">
+                  <h3 className="text-lg font-semibold capitalize">{role}s ({roleUsers.length})</h3>
+                  <div className="space-y-3">
+                    {roleUsers.map((user) => (
+                      <Card key={user.id}>
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{user.full_name}</CardTitle>
+                              <p className="text-sm text-muted-foreground">{user.email}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Joined: {new Date(user.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <Badge variant={getRoleBadgeVariant(user.role)}>
+                              {user.role}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex items-center justify-between">
+                            <Select
+                              value={user.role}
+                              onValueChange={(value) => updateUserRole(user.user_id, value as Enums<'app_role'>)}
+                            >
+                              <SelectTrigger className="w-40">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="applicant">Applicant</SelectItem>
+                                <SelectItem value="reviewer">Reviewer</SelectItem>
+                                <SelectItem value="admin">Admin</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedUser(user)}
+                                className="flex items-center gap-2"
+                              >
+                                <Edit className="h-4 w-4" />
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => deleteUser(user.user_id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Delete
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </TabsContent>
         </Tabs>
       </div>
@@ -424,6 +516,13 @@ export default function AdminDashboard() {
         application={selectedApplication}
         open={!!selectedApplication}
         onOpenChange={() => setSelectedApplication(null)}
+      />
+      
+      <UserEditModal
+        user={selectedUser}
+        open={!!selectedUser}
+        onOpenChange={() => setSelectedUser(null)}
+        onSuccess={fetchUsers}
       />
     </DashboardLayout>
   );

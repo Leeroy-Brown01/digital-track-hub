@@ -92,6 +92,7 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
         });
 
       onSuccess();
+      onOpenChange(false);
       
       // Reset form
       setFiles([]);

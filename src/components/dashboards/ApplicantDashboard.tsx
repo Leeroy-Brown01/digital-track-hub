@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, FileText, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Plus, FileText, Clock, CheckCircle, XCircle, Eye, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Tables } from '@/integrations/supabase/types';
@@ -88,6 +88,30 @@ export default function ApplicantDashboard() {
     });
   };
 
+  const deleteApplication = async (applicationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      await fetchApplications();
+      toast({
+        title: "Success",
+        description: "Application deleted successfully"
+      });
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete application",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <DashboardLayout title="My Applications">
@@ -152,13 +176,23 @@ export default function ApplicantDashboard() {
                     <div className="text-sm text-muted-foreground">
                       Submitted: {new Date(application.created_at).toLocaleDateString()}
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setSelectedApplication(application)}
-                    >
-                      View Details
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setSelectedApplication(application)}
+                      >
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => deleteApplication(application.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

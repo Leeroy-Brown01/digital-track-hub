@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { FileText, Clock, CheckCircle, XCircle, Eye, MessageSquare, Search } from 'lucide-react';
+import { FileText, Clock, CheckCircle, XCircle, Eye, MessageSquare, Search, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Tables, Enums } from '@/integrations/supabase/types';
@@ -94,6 +94,30 @@ export default function ReviewerDashboard() {
       toast({
         title: "Error",
         description: "Failed to update status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteApplication = async (applicationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      await fetchAssignedApplications();
+      toast({
+        title: "Success",
+        description: "Application deleted successfully"
+      });
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete application",
         variant: "destructive"
       });
     }
@@ -363,15 +387,25 @@ export default function ReviewerDashboard() {
                         </Dialog>
                       </div>
                       
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedApplication(application)}
-                        className="flex items-center gap-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View Details
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedApplication(application)}
+                          className="flex items-center gap-2"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View Details
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteApplication(application.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
