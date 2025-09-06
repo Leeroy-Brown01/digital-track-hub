@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Bell, Check, Trash2, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -10,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const { 
     notifications, 
     unreadCount, 
@@ -39,6 +41,13 @@ export const NotificationBell = () => {
       await markAsRead(notification.id);
     }
     setIsOpen(false);
+    
+    // Navigate to the related application if available
+    if (notification.related_id && notification.related_type === 'application') {
+      // Stay on dashboard but could scroll to or highlight the specific application
+      // For now, just navigate to dashboard which shows applications
+      navigate('/dashboard');
+    }
   };
 
   if (loading) {
