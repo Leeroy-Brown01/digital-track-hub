@@ -322,119 +322,119 @@ export default function AdminDashboard() {
         {/* Clickable Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-slate text-cream border-slate/20 ${expandedStatuses.has('total') ? 'ring-2 ring-terracotta' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-deep-forest text-alabaster border-bronze/30 ${expandedStatuses.has('total') ? 'ring-2 ring-bronze' : ''}`}
             onClick={() => toggleStatusExpansion('total')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between text-cream">
+              <CardTitle className="text-sm flex items-center justify-between text-alabaster">
                 Total Applications
                 {expandedStatuses.has('total') ? 
-                  <ChevronDown className="h-3 w-3 text-terracotta" /> : 
-                  <ChevronRight className="h-3 w-3 text-terracotta" />
+                  <ChevronDown className="h-3 w-3 text-bronze" /> : 
+                  <ChevronRight className="h-3 w-3 text-bronze" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-cream">{stats.total}</div>
-              <p className="text-xs text-cream/70">Click to view all</p>
+              <div className="text-2xl font-bold text-alabaster">{stats.total}</div>
+              <p className="text-xs text-alabaster/70">Click to view all</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-terracotta text-cream border-terracotta/20 ${expandedStatuses.has('pending') ? 'ring-2 ring-slate' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-bronze text-deep-forest border-deep-forest/20 ${expandedStatuses.has('pending') ? 'ring-2 ring-deep-forest' : ''}`}
             onClick={() => toggleStatusExpansion('pending')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between text-cream">
+              <CardTitle className="text-sm flex items-center justify-between text-deep-forest">
                 Pending
                 {expandedStatuses.has('pending') ? 
-                  <ChevronDown className="h-3 w-3 text-slate" /> : 
-                  <ChevronRight className="h-3 w-3 text-slate" />
+                  <ChevronDown className="h-3 w-3 text-deep-forest" /> : 
+                  <ChevronRight className="h-3 w-3 text-deep-forest" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-cream">{stats.pending}</div>
-              <p className="text-xs text-cream/70">Click to view pending</p>
+              <div className="text-2xl font-bold text-deep-forest">{stats.pending}</div>
+              <p className="text-xs text-deep-forest/70">Click to view pending</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('under_review') ? 'ring-2 ring-primary' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-alabaster text-deep-forest border-bronze/20 ${expandedStatuses.has('under_review') ? 'ring-2 ring-bronze' : ''}`}
             onClick={() => toggleStatusExpansion('under_review')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center justify-between text-deep-forest">
                 Under Review
                 {expandedStatuses.has('under_review') ? 
-                  <ChevronDown className="h-3 w-3" /> : 
-                  <ChevronRight className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3 text-bronze" /> : 
+                  <ChevronRight className="h-3 w-3 text-bronze" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.under_review}</div>
-              <p className="text-xs text-muted-foreground">Click to view reviewing</p>
+              <div className="text-2xl font-bold text-bronze">{stats.under_review}</div>
+              <p className="text-xs text-deep-forest/60">Click to view reviewing</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('approved') ? 'ring-2 ring-primary' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-deep-forest text-alabaster border-bronze/30 ${expandedStatuses.has('approved') ? 'ring-2 ring-bronze' : ''}`}
             onClick={() => toggleStatusExpansion('approved')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center justify-between text-alabaster">
                 Approved
                 {expandedStatuses.has('approved') ? 
-                  <ChevronDown className="h-3 w-3" /> : 
-                  <ChevronRight className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3 text-bronze" /> : 
+                  <ChevronRight className="h-3 w-3 text-bronze" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
-              <p className="text-xs text-muted-foreground">Click to view approved</p>
+              <div className="text-2xl font-bold text-bronze">{stats.approved}</div>
+              <p className="text-xs text-alabaster/70">Click to view approved</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('rejected') ? 'ring-2 ring-primary' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-bronze text-deep-forest border-deep-forest/20 ${expandedStatuses.has('rejected') ? 'ring-2 ring-deep-forest' : ''}`}
             onClick={() => toggleStatusExpansion('rejected')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center justify-between text-deep-forest">
                 Rejected
                 {expandedStatuses.has('rejected') ? 
-                  <ChevronDown className="h-3 w-3" /> : 
-                  <ChevronRight className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3 text-deep-forest" /> : 
+                  <ChevronRight className="h-3 w-3 text-deep-forest" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
-              <p className="text-xs text-muted-foreground">Click to view rejected</p>
+              <div className="text-2xl font-bold text-deep-forest">{stats.rejected}</div>
+              <p className="text-xs text-deep-forest/70">Click to view rejected</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'users' ? 'ring-2 ring-primary' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-alabaster text-deep-forest border-bronze/20 ${activeTab === 'users' ? 'ring-2 ring-bronze' : ''}`}
             onClick={() => setActiveTab('users')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Total Users</CardTitle>
+              <CardTitle className="text-sm text-deep-forest">Total Users</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.users}</div>
+              <div className="text-2xl font-bold text-bronze">{stats.users}</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="applications" className="space-y-4">
-          <TabsList className="bg-cream border-slate/20">
-            <TabsTrigger value="applications" className="flex items-center gap-2 data-[state=active]:bg-terracotta data-[state=active]:text-cream">
+          <TabsList className="bg-deep-forest border-bronze/30">
+            <TabsTrigger value="applications" className="flex items-center gap-2 text-alabaster data-[state=active]:bg-bronze data-[state=active]:text-deep-forest">
               <FileText className="h-4 w-4" />
               Applications
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-slate data-[state=active]:text-cream">
+            <TabsTrigger value="analytics" className="flex items-center gap-2 text-alabaster data-[state=active]:bg-bronze data-[state=active]:text-deep-forest">
               <TrendingUp className="h-4 w-4" />
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2 data-[state=active]:bg-terracotta data-[state=active]:text-cream">
+            <TabsTrigger value="users" className="flex items-center gap-2 text-alabaster data-[state=active]:bg-bronze data-[state=active]:text-deep-forest">
               <Users className="h-4 w-4" />
               User Management
             </TabsTrigger>
@@ -570,7 +570,7 @@ export default function AdminDashboard() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => setSelectedApplication(application)}
-                                  className="flex items-center gap-2 border-slate text-slate hover:bg-slate hover:text-cream transition-all duration-300"
+                                  className="flex items-center gap-2 border-bronze text-bronze hover:bg-bronze hover:text-alabaster transition-all duration-300"
                                 >
                                   <Eye className="h-4 w-4" />
                                   View Details
@@ -597,36 +597,36 @@ export default function AdminDashboard() {
 
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-slate text-cream border-slate/20">
+              <Card className="bg-deep-forest text-alabaster border-bronze/30">
                 <CardHeader>
-                  <CardTitle className="text-cream">Applications Over Time</CardTitle>
+                  <CardTitle className="text-alabaster">Applications Over Time</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={monthlyData}>
                       <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                      <XAxis dataKey="month" stroke="#F4F1ED" />
-                      <YAxis stroke="#F4F1ED" />
+                      <XAxis dataKey="month" stroke="#F5F5F5" />
+                      <YAxis stroke="#F5F5F5" />
                       <Tooltip />
-                      <Line type="monotone" dataKey="total" stroke="#E27D60" strokeWidth={3} />
+                      <Line type="monotone" dataKey="total" stroke="#CD7F32" strokeWidth={3} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
-              <Card className="bg-cream border-terracotta/20">
+              <Card className="bg-alabaster border-bronze/20">
                 <CardHeader>
-                  <CardTitle className="text-slate">Status Distribution by Month</CardTitle>
+                  <CardTitle className="text-deep-forest">Status Distribution by Month</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={monthlyData}>
                       <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                      <XAxis dataKey="month" stroke="#3E4E50" />
-                      <YAxis stroke="#3E4E50" />
+                      <XAxis dataKey="month" stroke="#102B2D" />
+                      <YAxis stroke="#102B2D" />
                       <Tooltip />
-                      <Bar dataKey="pending" stackId="a" fill="#E27D60" />
-                      <Bar dataKey="under_review" stackId="a" fill="#3E4E50" />
+                      <Bar dataKey="pending" stackId="a" fill="#CD7F32" />
+                      <Bar dataKey="under_review" stackId="a" fill="#102B2D" />
                       <Bar dataKey="approved" stackId="a" fill="#10b981" />
                       <Bar dataKey="rejected" stackId="a" fill="#ef4444" />
                     </BarChart>
@@ -645,49 +645,49 @@ export default function AdminDashboard() {
             {/* User Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <Card 
-                className="cursor-pointer hover:shadow-md transition-all"
+                className="cursor-pointer hover:shadow-lg hover:scale-105 transition-all bg-deep-forest text-alabaster border-bronze/30"
                 onClick={() => toggleRoleExpansion('reviewer')}
               >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center justify-between text-alabaster">
                     <div className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-blue-500" />
+                      <Users className="h-5 w-5 text-bronze" />
                       Reviewers
                     </div>
                     {expandedRoles.has('reviewer') ? 
-                      <ChevronDown className="h-4 w-4" /> : 
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4 text-bronze" /> : 
+                      <ChevronRight className="h-4 w-4 text-bronze" />
                     }
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-bronze">
                     {users.filter(u => u.role === 'reviewer').length}
                   </div>
-                  <p className="text-sm text-muted-foreground">Click to view active reviewers</p>
+                  <p className="text-sm text-alabaster/70">Click to view active reviewers</p>
                 </CardContent>
               </Card>
               <Card 
-                className="cursor-pointer hover:shadow-md transition-all"
+                className="cursor-pointer hover:shadow-lg hover:scale-105 transition-all bg-bronze text-deep-forest border-deep-forest/20"
                 onClick={() => toggleRoleExpansion('applicant')}
               >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center justify-between text-deep-forest">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-green-500" />
+                      <FileText className="h-5 w-5 text-deep-forest" />
                       Applicants
                     </div>
                     {expandedRoles.has('applicant') ? 
-                      <ChevronDown className="h-4 w-4" /> : 
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4 text-deep-forest" /> : 
+                      <ChevronRight className="h-4 w-4 text-deep-forest" />
                     }
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-deep-forest">
                     {users.filter(u => u.role === 'applicant').length}
                   </div>
-                  <p className="text-sm text-muted-foreground">Click to view registered applicants</p>
+                  <p className="text-sm text-deep-forest/70">Click to view registered applicants</p>
                 </CardContent>
               </Card>
             </div>
@@ -712,10 +712,10 @@ export default function AdminDashboard() {
               return (
                 <div key={role} className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${role === 'reviewer' ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-green-100 dark:bg-green-900/20'}`}>
+                    <div className={`p-2 rounded-lg ${role === 'reviewer' ? 'bg-deep-forest' : 'bg-bronze'}`}>
                       {role === 'reviewer' ? 
-                        <UserCheck className={`h-5 w-5 ${role === 'reviewer' ? 'text-blue-600' : 'text-green-600'}`} /> :
-                        <FileText className={`h-5 w-5 ${role === 'reviewer' ? 'text-blue-600' : 'text-green-600'}`} />
+                        <UserCheck className={`h-5 w-5 ${role === 'reviewer' ? 'text-alabaster' : 'text-deep-forest'}`} /> :
+                        <FileText className={`h-5 w-5 ${role === 'reviewer' ? 'text-alabaster' : 'text-deep-forest'}`} />
                       }
                     </div>
                     <div>
@@ -726,16 +726,16 @@ export default function AdminDashboard() {
                   
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {roleUsers.map((user) => (
-                      <Card key={user.id} className="hover:shadow-md transition-shadow">
+                      <Card key={user.id} className="hover:shadow-lg hover:scale-105 transition-all bg-alabaster border-bronze/20">
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-3">
-                              <div className={`p-2 rounded-full ${role === 'reviewer' ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-green-100 dark:bg-green-900/20'}`}>
-                                <Users className={`h-4 w-4 ${role === 'reviewer' ? 'text-blue-600' : 'text-green-600'}`} />
+                              <div className={`p-2 rounded-full ${role === 'reviewer' ? 'bg-deep-forest' : 'bg-bronze'}`}>
+                                <Users className={`h-4 w-4 ${role === 'reviewer' ? 'text-alabaster' : 'text-deep-forest'}`} />
                               </div>
                               <div>
-                                <CardTitle className="text-base">{user.full_name}</CardTitle>
-                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                                <CardTitle className="text-base text-deep-forest">{user.full_name}</CardTitle>
+                                <p className="text-sm text-deep-forest/60">{user.email}</p>
                               </div>
                             </div>
                             <Badge variant={getRoleBadgeVariant(user.role)} className="ml-2">

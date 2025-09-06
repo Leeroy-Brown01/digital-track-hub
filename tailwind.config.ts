@@ -18,6 +18,9 @@ export default {
         slate: "hsl(var(--slate))",
         cream: "hsl(var(--cream))",
         terracotta: "hsl(var(--terracotta))",
+        "deep-forest": "hsl(var(--deep-forest))",
+        bronze: "hsl(var(--bronze))",
+        alabaster: "hsl(var(--alabaster))",
         
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
