@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { LogOut, User } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -44,6 +45,8 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   {profile?.role}
                 </Badge>
               </div>
+              
+              <NotificationBell />
               
               <Button 
                 variant="outline" 
