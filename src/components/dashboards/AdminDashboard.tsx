@@ -322,39 +322,39 @@ export default function AdminDashboard() {
         {/* Clickable Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('total') ? 'ring-2 ring-primary' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-slate text-cream border-slate/20 ${expandedStatuses.has('total') ? 'ring-2 ring-terracotta' : ''}`}
             onClick={() => toggleStatusExpansion('total')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center justify-between text-cream">
                 Total Applications
                 {expandedStatuses.has('total') ? 
-                  <ChevronDown className="h-3 w-3" /> : 
-                  <ChevronRight className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3 text-terracotta" /> : 
+                  <ChevronRight className="h-3 w-3 text-terracotta" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground">Click to view all</p>
+              <div className="text-2xl font-bold text-cream">{stats.total}</div>
+              <p className="text-xs text-cream/70">Click to view all</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('pending') ? 'ring-2 ring-primary' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-terracotta text-cream border-terracotta/20 ${expandedStatuses.has('pending') ? 'ring-2 ring-slate' : ''}`}
             onClick={() => toggleStatusExpansion('pending')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between">
+              <CardTitle className="text-sm flex items-center justify-between text-cream">
                 Pending
                 {expandedStatuses.has('pending') ? 
-                  <ChevronDown className="h-3 w-3" /> : 
-                  <ChevronRight className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3 text-slate" /> : 
+                  <ChevronRight className="h-3 w-3 text-slate" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-              <p className="text-xs text-muted-foreground">Click to view pending</p>
+              <div className="text-2xl font-bold text-cream">{stats.pending}</div>
+              <p className="text-xs text-cream/70">Click to view pending</p>
             </CardContent>
           </Card>
           <Card 
@@ -425,16 +425,16 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="applications" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="applications" className="flex items-center gap-2">
+          <TabsList className="bg-cream border-slate/20">
+            <TabsTrigger value="applications" className="flex items-center gap-2 data-[state=active]:bg-terracotta data-[state=active]:text-cream">
               <FileText className="h-4 w-4" />
               Applications
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-slate data-[state=active]:text-cream">
               <TrendingUp className="h-4 w-4" />
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
+            <TabsTrigger value="users" className="flex items-center gap-2 data-[state=active]:bg-terracotta data-[state=active]:text-cream">
               <Users className="h-4 w-4" />
               User Management
             </TabsTrigger>
@@ -509,7 +509,7 @@ export default function AdminDashboard() {
                   ) : (
                     <div className="space-y-4">
                       {filteredApps.map((application) => (
-                        <Card key={application.id}>
+                        <Card key={application.id} className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-terracotta bg-cream/50">
                           <CardHeader>
                             <div className="flex items-start justify-between">
                               <div>
@@ -570,7 +570,7 @@ export default function AdminDashboard() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => setSelectedApplication(application)}
-                                  className="flex items-center gap-2"
+                                  className="flex items-center gap-2 border-slate text-slate hover:bg-slate hover:text-cream transition-all duration-300"
                                 >
                                   <Eye className="h-4 w-4" />
                                   View Details
@@ -579,7 +579,7 @@ export default function AdminDashboard() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => deleteApplication(application.id)}
-                                  className="text-destructive hover:text-destructive"
+                                  className="text-destructive hover:text-destructive border-red-300 hover:bg-red-50"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -597,36 +597,36 @@ export default function AdminDashboard() {
 
           <TabsContent value="analytics" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-slate text-cream border-slate/20">
                 <CardHeader>
-                  <CardTitle>Applications Over Time</CardTitle>
+                  <CardTitle className="text-cream">Applications Over Time</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={monthlyData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis dataKey="month" stroke="#F4F1ED" />
+                      <YAxis stroke="#F4F1ED" />
                       <Tooltip />
-                      <Line type="monotone" dataKey="total" stroke="#8884d8" strokeWidth={2} />
+                      <Line type="monotone" dataKey="total" stroke="#E27D60" strokeWidth={3} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-cream border-terracotta/20">
                 <CardHeader>
-                  <CardTitle>Status Distribution by Month</CardTitle>
+                  <CardTitle className="text-slate">Status Distribution by Month</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={monthlyData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis dataKey="month" stroke="#3E4E50" />
+                      <YAxis stroke="#3E4E50" />
                       <Tooltip />
-                      <Bar dataKey="pending" stackId="a" fill="#eab308" />
-                      <Bar dataKey="under_review" stackId="a" fill="#3b82f6" />
+                      <Bar dataKey="pending" stackId="a" fill="#E27D60" />
+                      <Bar dataKey="under_review" stackId="a" fill="#3E4E50" />
                       <Bar dataKey="approved" stackId="a" fill="#10b981" />
                       <Bar dataKey="rejected" stackId="a" fill="#ef4444" />
                     </BarChart>
