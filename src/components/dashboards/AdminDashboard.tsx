@@ -64,8 +64,11 @@ export default function AdminDashboard() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers(data || []);
-      setReviewers(data?.filter(user => user.role === 'reviewer') || []);
+      // Filter out admin users from the main users list for user management
+      const allUsers = data || [];
+      const nonAdminUsers = allUsers.filter(user => user.role !== 'admin');
+      setUsers(nonAdminUsers);
+      setReviewers(allUsers.filter(user => user.role === 'reviewer') || []);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
@@ -544,66 +547,132 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="users" className="space-y-4">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold mb-2">User Management</h2>
+              <p className="text-sm text-muted-foreground">Manage user roles and permissions. Admin users are hidden for security.</p>
+            </div>
+
+            {/* User Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Users className="h-5 w-5 text-blue-500" />
+                    Reviewers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {users.filter(u => u.role === 'reviewer').length}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Active reviewers in the system</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-green-500" />
+                    Applicants
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {users.filter(u => u.role === 'applicant').length}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Registered applicants</p>
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Users by Role */}
-            {['admin', 'reviewer', 'applicant'].map((role) => {
+            {['reviewer', 'applicant'].map((role) => {
               const roleUsers = users.filter(user => user.role === role);
-              if (roleUsers.length === 0) return null;
+              if (roleUsers.length === 0) return (
+                <Card key={role} className="p-6">
+                  <div className="text-center text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <h3 className="text-lg font-medium capitalize mb-1">No {role}s</h3>
+                    <p className="text-sm">No {role}s have been registered yet.</p>
+                  </div>
+                </Card>
+              );
               
               return (
-                <div key={role} className="space-y-3">
-                  <h3 className="text-lg font-semibold capitalize">{role}s ({roleUsers.length})</h3>
-                  <div className="space-y-3">
+                <div key={role} className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${role === 'reviewer' ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-green-100 dark:bg-green-900/20'}`}>
+                      {role === 'reviewer' ? 
+                        <UserCheck className={`h-5 w-5 ${role === 'reviewer' ? 'text-blue-600' : 'text-green-600'}`} /> :
+                        <FileText className={`h-5 w-5 ${role === 'reviewer' ? 'text-blue-600' : 'text-green-600'}`} />
+                      }
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold capitalize">{role}s</h3>
+                      <p className="text-sm text-muted-foreground">{roleUsers.length} {role}{roleUsers.length !== 1 ? 's' : ''} in total</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {roleUsers.map((user) => (
-                      <Card key={user.id}>
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <CardTitle className="text-lg">{user.full_name}</CardTitle>
-                              <p className="text-sm text-muted-foreground">{user.email}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Joined: {new Date(user.created_at).toLocaleDateString()}
-                              </p>
+                      <Card key={user.id} className="hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-full ${role === 'reviewer' ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-green-100 dark:bg-green-900/20'}`}>
+                                <Users className={`h-4 w-4 ${role === 'reviewer' ? 'text-blue-600' : 'text-green-600'}`} />
+                              </div>
+                              <div>
+                                <CardTitle className="text-base">{user.full_name}</CardTitle>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                              </div>
                             </div>
-                            <Badge variant={getRoleBadgeVariant(user.role)}>
+                            <Badge variant={getRoleBadgeVariant(user.role)} className="ml-2">
                               {user.role}
                             </Badge>
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="flex items-center justify-between">
-                            <Select
-                              value={user.role}
-                              onValueChange={(value) => updateUserRole(user.user_id, value as Enums<'app_role'>)}
-                            >
-                              <SelectTrigger className="w-40">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="applicant">Applicant</SelectItem>
-                                <SelectItem value="reviewer">Reviewer</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                              </SelectContent>
-                            </Select>
+                          <div className="space-y-3">
+                            <div className="text-xs text-muted-foreground">
+                              Joined: {new Date(user.created_at).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </div>
                             
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setSelectedUser(user)}
-                                className="flex items-center gap-2"
+                            <div className="flex items-center justify-between gap-2">
+                              <Select
+                                value={user.role}
+                                onValueChange={(value) => updateUserRole(user.user_id, value as Enums<'app_role'>)}
                               >
-                                <Edit className="h-4 w-4" />
-                                Edit
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => deleteUser(user.user_id)}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                                Delete
-                              </Button>
+                                <SelectTrigger className="w-32 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="applicant">Applicant</SelectItem>
+                                  <SelectItem value="reviewer">Reviewer</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedUser(user)}
+                                  className="h-8 px-2 text-xs"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => deleteUser(user.user_id)}
+                                  className="h-8 px-2 text-xs text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </CardContent>
