@@ -130,7 +130,7 @@ export default function AuthPage() {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full hover:scale-105 transition-all duration-300 bg-gradient-primary hover:shadow-glow" 
+                  className="w-full hover:scale-105 transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-glow font-semibold" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
@@ -175,7 +175,7 @@ export default function AuthPage() {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full hover:scale-105 transition-all duration-300 bg-gradient-primary hover:shadow-glow" 
+                  className="w-full hover:scale-105 transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-glow font-semibold" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Sign Up"}
