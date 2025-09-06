@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -133,12 +134,15 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Submit New Application</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <ScrollArea className="flex-1 pr-4">
+          <form onSubmit={handleSubmit} className="space-y-6"
+            id="application-form"
+          >
           <div className="space-y-2">
             <Label htmlFor="title">Application Title</Label>
             <Input
@@ -213,20 +217,26 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
             )}
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Submitting..." : "Submit Application"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </ScrollArea>
+        
+        <div className="flex justify-end space-x-2 pt-4 border-t">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            form="application-form"
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit Application"}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
