@@ -27,6 +27,7 @@ export default function ReviewerDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState('total');
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -189,12 +190,24 @@ export default function ReviewerDashboard() {
     }
   };
 
-  const filteredApplications = applications.filter(app => {
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-    const matchesSearch = app.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.profiles?.full_name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
+  const getFilteredApplications = () => {
+    let filtered = applications;
+    
+    // Filter by active tab
+    if (activeTab !== 'total') {
+      filtered = applications.filter(app => app.status === activeTab);
+    }
+    
+    // Apply search and status filters
+    return filtered.filter(app => {
+      const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+      const matchesSearch = app.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           app.profiles?.full_name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesStatus && matchesSearch;
+    });
+  };
+
+  const filteredApplications = getFilteredApplications();
 
   const stats = {
     total: applications.length,
@@ -217,17 +230,23 @@ export default function ReviewerDashboard() {
   return (
     <DashboardLayout title="Reviewer Dashboard">
       <div className="space-y-6">
-        {/* Stats Cards */}
+        {/* Clickable Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'total' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('total')}
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Assigned</CardTitle>
+              <CardTitle className="text-sm">Total Applications</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'pending' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('pending')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Pending</CardTitle>
             </CardHeader>
@@ -235,7 +254,10 @@ export default function ReviewerDashboard() {
               <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'under_review' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('under_review')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Under Review</CardTitle>
             </CardHeader>
@@ -243,7 +265,10 @@ export default function ReviewerDashboard() {
               <div className="text-2xl font-bold text-blue-600">{stats.under_review}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'approved' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('approved')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Approved</CardTitle>
             </CardHeader>
@@ -251,7 +276,10 @@ export default function ReviewerDashboard() {
               <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'rejected' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('rejected')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Rejected</CardTitle>
             </CardHeader>
@@ -263,7 +291,11 @@ export default function ReviewerDashboard() {
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Assigned Applications</h3>
+            <h3 className="text-lg font-medium">
+              {activeTab === 'total' ? 'All Assigned Applications' : 
+               `${activeTab.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Applications`} 
+              ({activeTab === 'total' ? stats.total : stats[activeTab as keyof typeof stats]})
+            </h3>
           </div>
 
           {/* Filters */}

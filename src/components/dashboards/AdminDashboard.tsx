@@ -5,13 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2 } from 'lucide-react';
+import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, Enums } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import ApplicationDetailsModal from '@/components/applications/ApplicationDetailsModal';
 import UserEditModal from '@/components/admin/UserEditModal';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 type Application = Tables<'applications'> & {
   profiles?: { full_name: string } | null;
@@ -28,6 +29,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('total');
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const { toast } = useToast();
 
   const fetchApplications = async () => {
@@ -75,9 +78,36 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchAnalyticsData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('applications')
+        .select('created_at, status')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      // Process data for monthly analytics
+      const monthlyStats = data?.reduce((acc: any, app: any) => {
+        const month = new Date(app.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        if (!acc[month]) {
+          acc[month] = { month, total: 0, pending: 0, under_review: 0, approved: 0, rejected: 0 };
+        }
+        acc[month].total++;
+        acc[month][app.status]++;
+        return acc;
+      }, {});
+
+      setMonthlyData(Object.values(monthlyStats || {}));
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
+
   useEffect(() => {
     fetchApplications();
     fetchUsers();
+    fetchAnalyticsData();
   }, []);
 
   const updateApplicationStatus = async (applicationId: string, status: Enums<'application_status'>) => {
@@ -222,12 +252,24 @@ export default function AdminDashboard() {
     }
   };
 
-  const filteredApplications = applications.filter(app => {
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-    const matchesSearch = app.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.profiles?.full_name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
+  const getFilteredApplications = () => {
+    let filtered = applications;
+    
+    // Filter by active tab
+    if (activeTab !== 'total' && activeTab !== 'users') {
+      filtered = applications.filter(app => app.status === activeTab);
+    }
+    
+    // Apply search and status filters
+    return filtered.filter(app => {
+      const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+      const matchesSearch = app.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           app.profiles?.full_name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesStatus && matchesSearch;
+    });
+  };
+
+  const filteredApplications = getFilteredApplications();
 
   const stats = {
     total: applications.length,
@@ -252,9 +294,12 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout title="Admin Dashboard">
       <div className="space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-          <Card>
+        {/* Clickable Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'total' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('total')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Total Applications</CardTitle>
             </CardHeader>
@@ -262,7 +307,10 @@ export default function AdminDashboard() {
               <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'pending' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('pending')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Pending</CardTitle>
             </CardHeader>
@@ -270,7 +318,10 @@ export default function AdminDashboard() {
               <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'under_review' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('under_review')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Under Review</CardTitle>
             </CardHeader>
@@ -278,7 +329,10 @@ export default function AdminDashboard() {
               <div className="text-2xl font-bold text-blue-600">{stats.under_review}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'approved' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('approved')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Approved</CardTitle>
             </CardHeader>
@@ -286,7 +340,10 @@ export default function AdminDashboard() {
               <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'rejected' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('rejected')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Rejected</CardTitle>
             </CardHeader>
@@ -294,20 +351,15 @@ export default function AdminDashboard() {
               <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'users' ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => setActiveTab('users')}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Total Users</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.users}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Reviewers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.reviewers}</div>
             </CardContent>
           </Card>
         </div>
@@ -318,6 +370,10 @@ export default function AdminDashboard() {
               <FileText className="h-4 w-4" />
               Applications
             </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               User Management
@@ -325,6 +381,14 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="applications" className="space-y-4">
+            <div className="mb-4">
+              <h3 className="text-lg font-medium">
+                {activeTab === 'total' ? 'All Applications' : 
+                 activeTab === 'users' ? 'User Management' :
+                 `${activeTab.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Applications`} 
+                ({activeTab === 'users' ? stats.users : activeTab === 'total' ? stats.total : stats[activeTab as keyof typeof stats]})
+              </h3>
+            </div>
             {/* Filters */}
             <div className="flex gap-4 items-center">
               <div className="flex-1">
@@ -435,6 +499,47 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Applications Over Time</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="total" stroke="#8884d8" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Status Distribution by Month</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="pending" stackId="a" fill="#eab308" />
+                      <Bar dataKey="under_review" stackId="a" fill="#3b82f6" />
+                      <Bar dataKey="approved" stackId="a" fill="#10b981" />
+                      <Bar dataKey="rejected" stackId="a" fill="#ef4444" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
