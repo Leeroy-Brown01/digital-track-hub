@@ -37,11 +37,15 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
     setLoading(true);
     
     try {
+      console.log('Starting application submission...');
       const formData = new FormData(e.currentTarget);
       const title = formData.get('title') as string;
       const description = formData.get('description') as string;
+      
+      console.log('Form data:', { title, description, fileCount: files.length });
 
       // Create application
+      console.log('Creating application...');
       const { data: application, error: applicationError } = await supabase
         .from('applications')
         .insert({
@@ -53,19 +57,31 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
         .select()
         .single();
 
-      if (applicationError) throw applicationError;
+      if (applicationError) {
+        console.error('Application creation error:', applicationError);
+        throw applicationError;
+      }
+
+      console.log('Application created:', application);
 
       // Upload files if any
       for (const file of files) {
-        const fileName = `${application.id}/${Date.now()}-${file.name}`;
+        console.log('Uploading file:', file.name);
+        const fileName = `${user.id}/${application.id}/${Date.now()}-${file.name}`;
         
-        const { error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('application-documents')
           .upload(fileName, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('File upload error:', uploadError);
+          throw uploadError;
+        }
+
+        console.log('File uploaded:', uploadData);
 
         // Save document record
+        console.log('Saving document record...');
         const { error: documentError } = await supabase
           .from('documents')
           .insert({
@@ -77,10 +93,14 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
             uploaded_by: user.id
           });
 
-        if (documentError) throw documentError;
+        if (documentError) {
+          console.error('Document record error:', documentError);
+          throw documentError;
+        }
       }
 
       // Log activity
+      console.log('Logging activity...');
       await supabase
         .from('activity_logs')
         .insert({
