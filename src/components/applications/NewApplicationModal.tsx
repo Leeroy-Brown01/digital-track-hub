@@ -67,7 +67,7 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
       // Upload files if any
       for (const file of files) {
         console.log('Uploading file:', file.name);
-        const fileName = `${user.id}/${application.id}/${Date.now()}-${file.name}`;
+        const fileName = `${user.id}/${Date.now()}-${file.name}`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('application-documents')
