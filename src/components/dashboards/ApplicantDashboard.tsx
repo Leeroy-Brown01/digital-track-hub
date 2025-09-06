@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, FileText, Clock, CheckCircle, XCircle, Eye, Trash2 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Plus, FileText, Clock, CheckCircle, XCircle, Eye, Trash2, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Tables } from '@/integrations/supabase/types';
@@ -18,6 +19,7 @@ export default function ApplicantDashboard() {
   const [loading, setLoading] = useState(true);
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+  const [openStatusCards, setOpenStatusCards] = useState<{ [key: string]: boolean }>({});
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -112,6 +114,24 @@ export default function ApplicantDashboard() {
     }
   };
 
+  const statusCategories = [
+    { status: 'pending', label: 'Pending', icon: Clock },
+    { status: 'under_review', label: 'Under Review', icon: Eye },
+    { status: 'approved', label: 'Approved', icon: CheckCircle },
+    { status: 'rejected', label: 'Rejected', icon: XCircle },
+  ];
+
+  const getApplicationsByStatus = (status: string) => {
+    return applications.filter(app => app.status === status);
+  };
+
+  const toggleStatusCard = (status: string) => {
+    setOpenStatusCards(prev => ({
+      ...prev,
+      [status]: !prev[status]
+    }));
+  };
+
   if (loading) {
     return (
       <DashboardLayout title="My Applications">
@@ -137,7 +157,7 @@ export default function ApplicantDashboard() {
           </Button>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-6">
           {applications.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">
@@ -152,51 +172,92 @@ export default function ApplicantDashboard() {
               </CardContent>
             </Card>
           ) : (
-            applications.map((application) => (
-              <Card key={application.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{application.title}</CardTitle>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {application.description}
-                      </p>
+            statusCategories.map((category) => {
+              const statusApplications = getApplicationsByStatus(category.status);
+              const IconComponent = category.icon;
+              
+              if (statusApplications.length === 0) return null;
+              
+              return (
+                <Collapsible
+                  key={category.status}
+                  open={openStatusCards[category.status]}
+                  onOpenChange={() => toggleStatusCard(category.status)}
+                >
+                  <CollapsibleTrigger asChild>
+                    <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <IconComponent className="h-6 w-6 text-primary" />
+                            <div>
+                              <CardTitle className="text-lg">{category.label}</CardTitle>
+                              <p className="text-sm text-muted-foreground">
+                                {statusApplications.length} application{statusApplications.length !== 1 ? 's' : ''}
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronDown 
+                            className={`h-5 w-5 transition-transform duration-200 ${
+                              openStatusCards[category.status] ? 'rotate-180' : ''
+                            }`} 
+                          />
+                        </div>
+                      </CardHeader>
+                    </Card>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="space-y-4 mt-4">
+                      {statusApplications.map((application) => (
+                        <Card key={application.id} className="hover:shadow-md transition-shadow ml-4">
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <CardTitle className="text-lg">{application.title}</CardTitle>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {application.description}
+                                </p>
+                              </div>
+                              <Badge 
+                                variant={getStatusVariant(application.status)}
+                                className="flex items-center gap-1"
+                              >
+                                {getStatusIcon(application.status)}
+                                {application.status.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm text-muted-foreground">
+                                Submitted: {new Date(application.created_at).toLocaleDateString()}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setSelectedApplication(application)}
+                                >
+                                  View Details
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => deleteApplication(application.id)}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
-                    <Badge 
-                      variant={getStatusVariant(application.status)}
-                      className="flex items-center gap-1"
-                    >
-                      {getStatusIcon(application.status)}
-                      {application.status.replace('_', ' ')}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                      Submitted: {new Date(application.created_at).toLocaleDateString()}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setSelectedApplication(application)}
-                      >
-                        View Details
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => deleteApplication(application.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            })
           )}
         </div>
       </div>
