@@ -153,14 +153,24 @@ export default function NewApplicationModal({ open, onOpenChange, onSuccess }: N
                 multiple
                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif"
                 onChange={handleFileSelect}
-                className="hidden"
+                style={{ display: 'none' }}
                 id="file-upload"
+                ref={(input) => {
+                  if (input) {
+                    input.onclick = () => {
+                      input.value = '';
+                    };
+                  }
+                }}
               />
-              <Label htmlFor="file-upload" className="cursor-pointer">
-                <Button type="button" variant="outline" size="sm">
-                  Choose Files
-                </Button>
-              </Label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={() => document.getElementById('file-upload')?.click()}
+              >
+                Choose Files
+              </Button>
             </div>
 
             {files.length > 0 && (
