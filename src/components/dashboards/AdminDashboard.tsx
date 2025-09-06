@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2, TrendingUp } from 'lucide-react';
+import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2, TrendingUp, ChevronDown, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, Enums } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
@@ -31,6 +31,7 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('total');
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const fetchApplications = async () => {
@@ -253,6 +254,16 @@ export default function AdminDashboard() {
       case 'applicant': return 'default';
       default: return 'outline';
     }
+  };
+
+  const toggleRoleExpansion = (role: string) => {
+    const newExpanded = new Set(expandedRoles);
+    if (newExpanded.has(role)) {
+      newExpanded.delete(role);
+    } else {
+      newExpanded.add(role);
+    }
+    setExpandedRoles(newExpanded);
   };
 
   const getFilteredApplications = () => {
@@ -554,39 +565,61 @@ export default function AdminDashboard() {
 
             {/* User Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <Card>
+              <Card 
+                className="cursor-pointer hover:shadow-md transition-all"
+                onClick={() => toggleRoleExpansion('reviewer')}
+              >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Users className="h-5 w-5 text-blue-500" />
-                    Reviewers
+                  <CardTitle className="text-base flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-blue-500" />
+                      Reviewers
+                    </div>
+                    {expandedRoles.has('reviewer') ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-blue-600">
                     {users.filter(u => u.role === 'reviewer').length}
                   </div>
-                  <p className="text-sm text-muted-foreground">Active reviewers in the system</p>
+                  <p className="text-sm text-muted-foreground">Click to view active reviewers</p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card 
+                className="cursor-pointer hover:shadow-md transition-all"
+                onClick={() => toggleRoleExpansion('applicant')}
+              >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-green-500" />
-                    Applicants
+                  <CardTitle className="text-base flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-green-500" />
+                      Applicants
+                    </div>
+                    {expandedRoles.has('applicant') ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
                     {users.filter(u => u.role === 'applicant').length}
                   </div>
-                  <p className="text-sm text-muted-foreground">Registered applicants</p>
+                  <p className="text-sm text-muted-foreground">Click to view registered applicants</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Users by Role */}
+            {/* Users by Role - Only show when expanded */}
             {['reviewer', 'applicant'].map((role) => {
               const roleUsers = users.filter(user => user.role === role);
+              const isExpanded = expandedRoles.has(role);
+              
+              if (!isExpanded) return null;
+              
               if (roleUsers.length === 0) return (
                 <Card key={role} className="p-6">
                   <div className="text-center text-muted-foreground">
