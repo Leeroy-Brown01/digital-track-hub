@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2, TrendingUp, ChevronDown, ChevronRight } from 'lucide-react';
+import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2, TrendingUp, ChevronDown, ChevronRight, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, Enums } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
@@ -32,6 +32,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('total');
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set());
+  const [expandedStatuses, setExpandedStatuses] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const fetchApplications = async () => {
@@ -266,6 +267,16 @@ export default function AdminDashboard() {
     setExpandedRoles(newExpanded);
   };
 
+  const toggleStatusExpansion = (status: string) => {
+    const newExpanded = new Set(expandedStatuses);
+    if (newExpanded.has(status)) {
+      newExpanded.delete(status);
+    } else {
+      newExpanded.add(status);
+    }
+    setExpandedStatuses(newExpanded);
+  };
+
   const getFilteredApplications = () => {
     let filtered = applications;
     
@@ -311,58 +322,93 @@ export default function AdminDashboard() {
         {/* Clickable Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'total' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => setActiveTab('total')}
+            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('total') ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => toggleStatusExpansion('total')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Total Applications</CardTitle>
+              <CardTitle className="text-sm flex items-center justify-between">
+                Total Applications
+                {expandedStatuses.has('total') ? 
+                  <ChevronDown className="h-3 w-3" /> : 
+                  <ChevronRight className="h-3 w-3" />
+                }
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
+              <p className="text-xs text-muted-foreground">Click to view all</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'pending' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => setActiveTab('pending')}
+            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('pending') ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => toggleStatusExpansion('pending')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Pending</CardTitle>
+              <CardTitle className="text-sm flex items-center justify-between">
+                Pending
+                {expandedStatuses.has('pending') ? 
+                  <ChevronDown className="h-3 w-3" /> : 
+                  <ChevronRight className="h-3 w-3" />
+                }
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <p className="text-xs text-muted-foreground">Click to view pending</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'under_review' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => setActiveTab('under_review')}
+            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('under_review') ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => toggleStatusExpansion('under_review')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Under Review</CardTitle>
+              <CardTitle className="text-sm flex items-center justify-between">
+                Under Review
+                {expandedStatuses.has('under_review') ? 
+                  <ChevronDown className="h-3 w-3" /> : 
+                  <ChevronRight className="h-3 w-3" />
+                }
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">{stats.under_review}</div>
+              <p className="text-xs text-muted-foreground">Click to view reviewing</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'approved' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => setActiveTab('approved')}
+            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('approved') ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => toggleStatusExpansion('approved')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Approved</CardTitle>
+              <CardTitle className="text-sm flex items-center justify-between">
+                Approved
+                {expandedStatuses.has('approved') ? 
+                  <ChevronDown className="h-3 w-3" /> : 
+                  <ChevronRight className="h-3 w-3" />
+                }
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+              <p className="text-xs text-muted-foreground">Click to view approved</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-md ${activeTab === 'rejected' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => setActiveTab('rejected')}
+            className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('rejected') ? 'ring-2 ring-primary' : ''}`}
+            onClick={() => toggleStatusExpansion('rejected')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Rejected</CardTitle>
+              <CardTitle className="text-sm flex items-center justify-between">
+                Rejected
+                {expandedStatuses.has('rejected') ? 
+                  <ChevronDown className="h-3 w-3" /> : 
+                  <ChevronRight className="h-3 w-3" />
+                }
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+              <p className="text-xs text-muted-foreground">Click to view rejected</p>
             </CardContent>
           </Card>
           <Card 
@@ -395,125 +441,158 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="applications" className="space-y-4">
-            <div className="mb-4">
-              <h3 className="text-lg font-medium">
-                {activeTab === 'total' ? 'All Applications' : 
-                 activeTab === 'users' ? 'User Management' :
-                 `${activeTab.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Applications`} 
-                ({activeTab === 'users' ? stats.users : activeTab === 'total' ? stats.total : stats[activeTab as keyof typeof stats]})
-              </h3>
-            </div>
-            {/* Filters */}
-            <div className="flex gap-4 items-center">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                  <Input
-                    placeholder="Search applications or applicants..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="under_review">Under Review</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Applications by Status - Only show when expanded */}
+            {['total', 'pending', 'under_review', 'approved', 'rejected'].map((status) => {
+              const isExpanded = expandedStatuses.has(status);
+              if (!isExpanded) return null;
+              
+              const statusApplications = status === 'total' ? applications : applications.filter(app => app.status === status);
+              const filteredApps = statusApplications.filter(app => {
+                const matchesSearch = app.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                     app.profiles?.full_name.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesSearch;
+              });
+              
+              return (
+                <div key={status} className="space-y-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-2 rounded-lg ${
+                      status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/20' :
+                      status === 'under_review' ? 'bg-blue-100 dark:bg-blue-900/20' :
+                      status === 'approved' ? 'bg-green-100 dark:bg-green-900/20' :
+                      status === 'rejected' ? 'bg-red-100 dark:bg-red-900/20' :
+                      'bg-gray-100 dark:bg-gray-900/20'
+                    }`}>
+                      {status === 'pending' && <Clock className="h-5 w-5 text-yellow-600" />}
+                      {status === 'under_review' && <Eye className="h-5 w-5 text-blue-600" />}
+                      {status === 'approved' && <CheckCircle className="h-5 w-5 text-green-600" />}
+                      {status === 'rejected' && <XCircle className="h-5 w-5 text-red-600" />}
+                      {status === 'total' && <FileText className="h-5 w-5 text-gray-600" />}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold capitalize">
+                        {status === 'total' ? 'All Applications' : status.replace('_', ' ')} Applications
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {filteredApps.length} application{filteredApps.length !== 1 ? 's' : ''} 
+                        {searchTerm && ` matching "${searchTerm}"`}
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Applications List */}
-            <div className="space-y-4">
-              {filteredApplications.map((application) => (
-                <Card key={application.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{application.title}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          By: {application.profiles?.full_name} • 
-                          Submitted: {new Date(application.created_at).toLocaleDateString()}
+                  {/* Search for this status */}
+                  <div className="mb-4">
+                    <div className="relative">
+                      <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                      <Input
+                        placeholder="Search in this category..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Applications List */}
+                  {filteredApps.length === 0 ? (
+                    <Card className="p-6">
+                      <div className="text-center text-muted-foreground">
+                        <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                        <h3 className="text-lg font-medium mb-1">
+                          No {status === 'total' ? '' : status.replace('_', ' ')} applications
+                        </h3>
+                        <p className="text-sm">
+                          {searchTerm ? `No applications match "${searchTerm}"` : 'No applications in this category yet.'}
                         </p>
-                        {application.assigned_reviewer && (
-                          <p className="text-sm text-muted-foreground">
-                            Assigned to: {application.assigned_reviewer.full_name}
-                          </p>
-                        )}
                       </div>
-                      <Badge variant={getStatusVariant(application.status)}>
-                        {application.status.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2 justify-between">
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={application.status}
-                          onValueChange={(value) => updateApplicationStatus(application.id, value as Enums<'application_status'>)}
-                        >
-                          <SelectTrigger className="w-40">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="under_review">Under Review</SelectItem>
-                            <SelectItem value="approved">Approved</SelectItem>
-                            <SelectItem value="rejected">Rejected</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    </Card>
+                  ) : (
+                    <div className="space-y-4">
+                      {filteredApps.map((application) => (
+                        <Card key={application.id}>
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <CardTitle className="text-lg">{application.title}</CardTitle>
+                                <p className="text-sm text-muted-foreground">
+                                  By: {application.profiles?.full_name} • 
+                                  Submitted: {new Date(application.created_at).toLocaleDateString()}
+                                </p>
+                                {application.assigned_reviewer && (
+                                  <p className="text-sm text-muted-foreground">
+                                    Assigned to: {application.assigned_reviewer.full_name}
+                                  </p>
+                                )}
+                              </div>
+                              <Badge variant={getStatusVariant(application.status)}>
+                                {application.status.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex items-center gap-2 justify-between">
+                              <div className="flex items-center gap-2">
+                                <Select
+                                  value={application.status}
+                                  onValueChange={(value) => updateApplicationStatus(application.id, value as Enums<'application_status'>)}
+                                >
+                                  <SelectTrigger className="w-40">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="under_review">Under Review</SelectItem>
+                                    <SelectItem value="approved">Approved</SelectItem>
+                                    <SelectItem value="rejected">Rejected</SelectItem>
+                                  </SelectContent>
+                                </Select>
 
-                        <Select
-                          value={application.assigned_reviewer_id || ''}
-                          onValueChange={(value) => assignReviewer(application.id, value)}
-                        >
-                          <SelectTrigger className="w-48">
-                            <UserCheck className="h-4 w-4 mr-2" />
-                            <SelectValue placeholder="Assign Reviewer" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {reviewers.map((reviewer) => (
-                              <SelectItem key={reviewer.user_id} value={reviewer.user_id}>
-                                {reviewer.full_name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedApplication(application)}
-                          className="flex items-center gap-2"
-                        >
-                          <Eye className="h-4 w-4" />
-                          View Details
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deleteApplication(application.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                                <Select
+                                  value={application.assigned_reviewer_id || ''}
+                                  onValueChange={(value) => assignReviewer(application.id, value)}
+                                >
+                                  <SelectTrigger className="w-48">
+                                    <UserCheck className="h-4 w-4 mr-2" />
+                                    <SelectValue placeholder="Assign Reviewer" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {reviewers.map((reviewer) => (
+                                      <SelectItem key={reviewer.user_id} value={reviewer.user_id}>
+                                        {reviewer.full_name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedApplication(application)}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  View Details
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => deleteApplication(application.id)}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  )}
+                </div>
+              );
+            })}
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-4">
