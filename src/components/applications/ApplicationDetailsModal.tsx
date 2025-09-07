@@ -1,3 +1,4 @@
+// Import statements for React hooks, UI components, icons, and utilities
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,12 +10,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
 
+// Type definitions for database entities
 type Application = Tables<'applications'>;
 type Document = Tables<'documents'>;
 type Comment = Tables<'application_comments'> & {
   profiles: { full_name: string; role: string } | null;
 };
 
+// Component props interface
 interface ApplicationDetailsModalProps {
   application: Application | null;
   open: boolean;
@@ -22,17 +25,19 @@ interface ApplicationDetailsModalProps {
 }
 
 export default function ApplicationDetailsModal({ application, open, onOpenChange }: ApplicationDetailsModalProps) {
+  // Component state management
   const [documents, setDocuments] = useState<Document[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Function to fetch application-related data (documents and comments) from the database
   const fetchApplicationData = async () => {
     if (!application) return;
-    
+
     setLoading(true);
     try {
-      // Fetch documents
+      // Fetch documents associated with the application, ordered by creation date (newest first)
       const { data: documentsData, error: documentsError } = await supabase
         .from('documents')
         .select('*')
@@ -42,7 +47,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
       if (documentsError) throw documentsError;
       setDocuments(documentsData || []);
 
-      // Fetch comments with profiles
+      // Fetch comments with associated user profile information, ordered by creation date (oldest first)
       const { data: commentsData, error: commentsError } = await supabase
         .from('application_comments')
         .select(`
@@ -54,7 +59,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
 
       if (commentsError) throw commentsError;
       setComments(commentsData || []);
-      
+
     } catch (error) {
       console.error('Error fetching application data:', error);
       toast({
@@ -67,20 +72,24 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
     }
   };
 
+  // Effect to fetch application data when the modal opens or application changes
   useEffect(() => {
     if (application && open) {
       fetchApplicationData();
     }
   }, [application, open]);
 
+  // Function to handle document download from Supabase storage
   const downloadDocument = async (document: Document) => {
     try {
+      // Download the file from Supabase storage using the document's storage path
       const { data, error } = await supabase.storage
         .from('application-documents')
         .download(document.storage_path);
 
       if (error) throw error;
 
+      // Create a temporary URL for the downloaded file and trigger download
       const url = window.URL.createObjectURL(data);
       const a = window.document.createElement('a');
       a.style.display = 'none';
@@ -89,14 +98,16 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
       window.document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
-      
+
+      // Show success notification
       toast({
         title: "Success",
         description: "Document downloaded successfully"
       });
-      
+
     } catch (error) {
       console.error('Error downloading document:', error);
+      // Show error notification if download fails
       toast({
         title: "Error",
         description: "Failed to download document",
@@ -105,6 +116,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
     }
   };
 
+  // Function to return the appropriate icon based on application status
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -120,6 +132,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
     }
   };
 
+  // Function to return the appropriate badge variant based on application status
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'pending':
@@ -135,6 +148,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
     }
   };
 
+  // Function to format file size in human-readable format (Bytes, KB, MB, GB)
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
