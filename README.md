@@ -6,7 +6,7 @@ SmartConnectHub is a comprehensive digital platform designed to streamline the a
 
 ## Key Functionalities
 
-### 🎯 **Core Features**
+### **Core Features**
 - **Digital Application Submissions**: Seamless online application process with form validation
 - **Multi-Role Dashboard System**: Tailored interfaces for Applicants, Reviewers, and Administrators
 - **Real-time Review Process**: Efficient application evaluation and status tracking
@@ -34,13 +34,13 @@ SmartConnectHub is a comprehensive digital platform designed to streamline the a
 - Monitor system analytics and performance
 - Configure system settings and workflows
 
-### 🔒 **Security & Compliance**
+###  **Security & Compliance**
 - **Row-Level Security (RLS)**: Ensures data privacy and access control
 - **Audit Trail**: Complete logging of all system activities
 - **Secure Authentication**: Robust user authentication with Supabase Auth
 - **Data Encryption**: Protected data transmission and storage
 
-### 🚀 **Technical Features**
+###  **Technical Features**
 - **Responsive Design**: Optimized for desktop and mobile devices
 - **Real-time Updates**: Live notifications and status changes
 - **File Upload Support**: Secure document and image handling
