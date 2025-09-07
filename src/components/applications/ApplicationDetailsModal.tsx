@@ -157,11 +157,14 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  // Early return if no application is provided
   if (!application) return null;
 
   return (
+    // Main modal dialog container
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        {/* Modal header with application title and status */}
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -170,7 +173,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
                 Application ID: {application.id.slice(0, 8)}
               </p>
             </div>
-            <Badge 
+            <Badge
               variant={getStatusVariant(application.status)}
               className="flex items-center gap-1"
             >
@@ -180,8 +183,9 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
           </div>
         </DialogHeader>
 
+        {/* Main content area with application sections */}
         <div className="space-y-6">
-          {/* Application Details */}
+          {/* Application Details Section */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Application Details</CardTitle>
@@ -191,7 +195,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
                 <h4 className="font-medium mb-2">Description</h4>
                 <p className="text-muted-foreground">{application.description}</p>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="font-medium">Submitted:</span>
@@ -209,7 +213,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
             </CardContent>
           </Card>
 
-          {/* Documents */}
+          {/* Documents Section */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -251,7 +255,7 @@ export default function ApplicationDetailsModal({ application, open, onOpenChang
             </CardContent>
           </Card>
 
-          {/* Comments & Feedback */}
+          {/* Comments & Feedback Section */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
