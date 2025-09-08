@@ -197,6 +197,38 @@ export default function AdminDashboard() {
     }
   };
 
+  const downloadDocument = async (document: any) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('application-documents')
+        .download(document.storage_path);
+
+      if (error) throw error;
+
+      // Create a blob URL and trigger download
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = document.file_name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Document downloaded successfully"
+      });
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download document",
+        variant: "destructive"
+      });
+    }
+  };
+
   const assignReviewer = async (applicationId: string, reviewerId: string) => {
     try {
       const { error } = await supabase
@@ -778,13 +810,7 @@ export default function AdminDashboard() {
                                 variant="outline"
                                 size="sm"
                                 className="border-bronze/50 text-bronze hover:bg-bronze hover:text-deep-forest"
-                                onClick={() => {
-                                  // Handle document download/view
-                                  toast({
-                                    title: "Info",
-                                    description: "Document viewing feature coming soon",
-                                  });
-                                }}
+                                onClick={() => downloadDocument(document)}
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
