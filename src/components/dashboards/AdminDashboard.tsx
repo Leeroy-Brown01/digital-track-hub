@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2, TrendingUp, ChevronDown, ChevronRight, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Users, FileText, BarChart3, Settings, Search, Filter, Eye, UserCheck, Edit, Trash2, TrendingUp, ChevronDown, ChevronRight, Clock, CheckCircle, XCircle, FolderOpen, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, Enums } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
@@ -18,17 +19,33 @@ type Application = Tables<'applications'> & {
   profiles?: { full_name: string } | null;
   assigned_reviewer?: { full_name: string } | null;
 };
+
 type Profile = Tables<'profiles'>;
+
+type Document = Tables<'documents'> & {
+  applications: {
+    title: string;
+    applicant_id: string;
+    profiles: {
+      full_name: string;
+    };
+  };
+  uploader: {
+    full_name: string;
+  };
+};
 
 export default function AdminDashboard() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [users, setUsers] = useState<Profile[]>([]);
   const [reviewers, setReviewers] = useState<Profile[]>([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [documentSearchTerm, setDocumentSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('total');
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set());
@@ -83,6 +100,46 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchDocuments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select(`
+          *,
+          applications!inner(
+            title,
+            applicant_id,
+            profiles!applications_applicant_id_fkey(
+              full_name
+            )
+          ),
+          uploader:profiles!documents_uploaded_by_fkey(
+            full_name
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching documents:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch documents",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setDocuments(data as Document[]);
+    } catch (error) {
+      console.error('Error in fetchDocuments:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch documents",
+        variant: "destructive",
+      });
+    }
+  };
+
   const fetchAnalyticsData = async () => {
     try {
       const { data, error } = await supabase
@@ -112,6 +169,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchApplications();
     fetchUsers();
+    fetchDocuments();
     fetchAnalyticsData();
   }, []);
 
@@ -434,6 +492,10 @@ export default function AdminDashboard() {
               <TrendingUp className="h-4 w-4" />
               Analytics
             </TabsTrigger>
+            <TabsTrigger value="documents" className="flex items-center gap-2 text-alabaster data-[state=active]:bg-bronze data-[state=active]:text-deep-forest">
+              <FolderOpen className="h-4 w-4" />
+              Document Management
+            </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2 text-alabaster data-[state=active]:bg-bronze data-[state=active]:text-deep-forest">
               <Users className="h-4 w-4" />
               User Management
@@ -634,6 +696,147 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="documents" className="space-y-4">
+            <Card className="bg-deep-forest/50 border-bronze/30">
+              <CardHeader>
+                <CardTitle className="text-alabaster flex items-center gap-2">
+                  <FolderOpen className="h-5 w-5 text-bronze" />
+                  Document Management & Tracking
+                </CardTitle>
+                <p className="text-alabaster/70 text-sm">
+                  Manage and track all documents uploaded across all applications
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Search Documents */}
+                <div className="flex gap-4">
+                  <div className="relative flex-1">
+                    <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+                    <Input
+                      placeholder="Search documents by name, application, or uploader..."
+                      value={documentSearchTerm}
+                      onChange={(e) => setDocumentSearchTerm(e.target.value)}
+                      className="pl-9 bg-background/50 border-bronze/30 text-alabaster placeholder:text-alabaster/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Documents Table */}
+                <div className="rounded-md border border-bronze/30">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-bronze/30 hover:bg-bronze/10">
+                        <TableHead className="text-alabaster">File Name</TableHead>
+                        <TableHead className="text-alabaster">Application</TableHead>
+                        <TableHead className="text-alabaster">Applicant</TableHead>
+                        <TableHead className="text-alabaster">File Type</TableHead>
+                        <TableHead className="text-alabaster">Size</TableHead>
+                        <TableHead className="text-alabaster">Uploaded Date</TableHead>
+                        <TableHead className="text-alabaster">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {documents
+                        .filter(doc => {
+                          const searchLower = documentSearchTerm.toLowerCase();
+                          return (
+                            doc.file_name.toLowerCase().includes(searchLower) ||
+                            doc.applications.title.toLowerCase().includes(searchLower) ||
+                            doc.applications.profiles.full_name.toLowerCase().includes(searchLower) ||
+                            doc.file_type.toLowerCase().includes(searchLower)
+                          );
+                        })
+                        .map((document) => (
+                          <TableRow key={document.id} className="border-bronze/30 hover:bg-bronze/5">
+                            <TableCell className="text-alabaster font-medium">
+                              <div className="flex items-center gap-2">
+                                <FileText className="h-4 w-4 text-bronze" />
+                                {document.file_name}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-alabaster">
+                              {document.applications.title}
+                            </TableCell>
+                            <TableCell className="text-alabaster">
+                              {document.applications.profiles.full_name}
+                            </TableCell>
+                            <TableCell className="text-alabaster">
+                              <Badge variant="outline" className="border-bronze/50 text-bronze">
+                                {document.file_type.toUpperCase()}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-alabaster">
+                              {(document.file_size / 1024 / 1024).toFixed(2)} MB
+                            </TableCell>
+                            <TableCell className="text-alabaster">
+                              {new Date(document.created_at).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-bronze/50 text-bronze hover:bg-bronze hover:text-deep-forest"
+                                onClick={() => {
+                                  // Handle document download/view
+                                  toast({
+                                    title: "Info",
+                                    description: "Document viewing feature coming soon",
+                                  });
+                                }}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      {documents.filter(doc => {
+                        const searchLower = documentSearchTerm.toLowerCase();
+                        return (
+                          doc.file_name.toLowerCase().includes(searchLower) ||
+                          doc.applications.title.toLowerCase().includes(searchLower) ||
+                          doc.applications.profiles.full_name.toLowerCase().includes(searchLower) ||
+                          doc.file_type.toLowerCase().includes(searchLower)
+                        );
+                      }).length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center text-alabaster/70 py-8">
+                            {documentSearchTerm ? 'No documents found matching your search.' : 'No documents uploaded yet.'}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Document Statistics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <Card className="bg-bronze/10 border-bronze/30">
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold text-bronze">{documents.length}</div>
+                      <p className="text-sm text-alabaster/70">Total Documents</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-bronze/10 border-bronze/30">
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold text-bronze">
+                        {(documents.reduce((acc, doc) => acc + doc.file_size, 0) / 1024 / 1024).toFixed(2)} MB
+                      </div>
+                      <p className="text-sm text-alabaster/70">Total Storage Used</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-bronze/10 border-bronze/30">
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold text-bronze">
+                        {new Set(documents.map(doc => doc.file_type)).size}
+                      </div>
+                      <p className="text-sm text-alabaster/70">File Types</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="users" className="space-y-4">
