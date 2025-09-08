@@ -282,7 +282,7 @@ export default function ReviewerDashboard() {
             {/* Clickable Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Card 
-                className={`cursor-pointer transition-all hover:shadow-md ${expandedStatuses.has('total') ? 'ring-2 ring-primary' : ''}`}
+                className={`cursor-pointer transition-all hover:shadow-md bg-white border ${expandedStatuses.has('total') ? 'ring-2 ring-primary' : ''}`}
                 onClick={() => toggleStatusExpansion('total')}
               >
                 <CardHeader className="pb-2">
@@ -299,11 +299,86 @@ export default function ReviewerDashboard() {
                   <p className="text-xs text-muted-foreground">Click to view all</p>
                 </CardContent>
               </Card>
-              {/* ... additional stat cards */}
+
+              <Card 
+                className={`cursor-pointer transition-all hover:shadow-md bg-green-500 text-white border-green-500 ${expandedStatuses.has('approved') ? 'ring-2 ring-white' : ''}`}
+                onClick={() => toggleStatusExpansion('approved')}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center justify-between text-white">
+                    Approved
+                    {expandedStatuses.has('approved') ? 
+                      <ChevronDown className="h-3 w-3" /> : 
+                      <ChevronRight className="h-3 w-3" />
+                    }
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{stats.approved}</div>
+                  <p className="text-xs text-green-100">Click to view approved</p>
+                </CardContent>
+              </Card>
+
+              <Card 
+                className={`cursor-pointer transition-all hover:shadow-md bg-red-500 text-white border-red-500 ${expandedStatuses.has('rejected') ? 'ring-2 ring-white' : ''}`}
+                onClick={() => toggleStatusExpansion('rejected')}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center justify-between text-white">
+                    Rejected
+                    {expandedStatuses.has('rejected') ? 
+                      <ChevronDown className="h-3 w-3" /> : 
+                      <ChevronRight className="h-3 w-3" />
+                    }
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{stats.rejected}</div>
+                  <p className="text-xs text-red-100">Click to view rejected</p>
+                </CardContent>
+              </Card>
+
+              <Card 
+                className={`cursor-pointer transition-all hover:shadow-md bg-orange-500 text-white border-orange-500 ${expandedStatuses.has('under_review') ? 'ring-2 ring-white' : ''}`}
+                onClick={() => toggleStatusExpansion('under_review')}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center justify-between text-white">
+                    Under Review
+                    {expandedStatuses.has('under_review') ? 
+                      <ChevronDown className="h-3 w-3" /> : 
+                      <ChevronRight className="h-3 w-3" />
+                    }
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{stats.under_review}</div>
+                  <p className="text-xs text-orange-100">Click to view under review</p>
+                </CardContent>
+              </Card>
+
+              <Card 
+                className={`cursor-pointer transition-all hover:shadow-md bg-white border ${expandedStatuses.has('pending') ? 'ring-2 ring-primary' : ''}`}
+                onClick={() => toggleStatusExpansion('pending')}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    Pending
+                    {expandedStatuses.has('pending') ? 
+                      <ChevronDown className="h-3 w-3" /> : 
+                      <ChevronRight className="h-3 w-3" />
+                    }
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.pending}</div>
+                  <p className="text-xs text-muted-foreground">Click to view pending</p>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Applications List */}
-            {expandedStatuses.has('total') && (
+            {(expandedStatuses.has('total') || expandedStatuses.has('approved') || expandedStatuses.has('rejected') || expandedStatuses.has('under_review') || expandedStatuses.has('pending')) && (
               <div className="space-y-4">
                 <div className="mb-4">
                   <div className="relative">
@@ -317,17 +392,44 @@ export default function ReviewerDashboard() {
                   </div>
                 </div>
 
-                {applications.length === 0 ? (
-                  <Card className="p-6">
-                    <div className="text-center text-muted-foreground">
-                      <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <h3 className="text-lg font-medium mb-1">No applications assigned</h3>
-                      <p className="text-sm">You don't have any applications assigned for review yet.</p>
-                    </div>
-                  </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {applications.map((application) => (
+                {(() => {
+                  let filteredApps = applications;
+                  
+                  // Filter based on expanded status
+                  if (expandedStatuses.has('approved')) {
+                    filteredApps = applications.filter(app => app.status === 'approved');
+                  } else if (expandedStatuses.has('rejected')) {
+                    filteredApps = applications.filter(app => app.status === 'rejected');
+                  } else if (expandedStatuses.has('under_review')) {
+                    filteredApps = applications.filter(app => app.status === 'under_review');
+                  } else if (expandedStatuses.has('pending')) {
+                    filteredApps = applications.filter(app => app.status === 'pending');
+                  }
+                  
+                  // Apply search filter
+                  if (searchTerm) {
+                    filteredApps = filteredApps.filter(app => 
+                      app.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      app.profiles?.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                  }
+
+                  return filteredApps.length === 0 ? (
+                    <Card className="p-6">
+                      <div className="text-center text-muted-foreground">
+                        <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                        <h3 className="text-lg font-medium mb-1">No applications found</h3>
+                        <p className="text-sm">
+                          {applications.length === 0 
+                            ? "You don't have any applications assigned for review yet."
+                            : "No applications match your current filter criteria."
+                          }
+                        </p>
+                      </div>
+                    </Card>
+                  ) : (
+                    <div className="space-y-4">
+                      {filteredApps.map((application) => (
                       <Card key={application.id} className="hover:shadow-md transition-shadow">
                         <CardHeader>
                           <div className="flex items-start justify-between">
@@ -427,9 +529,10 @@ export default function ReviewerDashboard() {
                           </div>
                         </CardContent>
                       </Card>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </TabsContent>
