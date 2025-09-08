@@ -363,6 +363,7 @@ export default function AdminDashboard() {
   };
 
   const toggleStatusExpansion = (status: string) => {
+    setActiveTab(status);
     const newExpanded = new Set(expandedStatuses);
     if (newExpanded.has(status)) {
       newExpanded.delete(status);
@@ -378,6 +379,11 @@ export default function AdminDashboard() {
     // Filter by active tab
     if (activeTab !== 'total' && activeTab !== 'users') {
       filtered = applications.filter(app => app.status === activeTab);
+    }
+    
+    // When showing unassigned applications for status cards
+    if (expandedStatuses.has(activeTab) && activeTab !== 'total' && activeTab !== 'users') {
+      filtered = filtered.filter(app => !app.assigned_reviewer_id);
     }
     
     // Apply search and status filters
