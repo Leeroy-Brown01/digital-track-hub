@@ -328,28 +328,18 @@ export default function AdminDashboard() {
     }
   };
 
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'pending': return 'secondary';
-      case 'under_review': return 'default';
-      case 'approved': return 'default';
-      case 'rejected': return 'destructive';
-      default: return 'outline';
-    }
-  };
-
   const getStatusBadgeStyles = (status: string) => {
     switch (status) {
       case 'approved': 
-        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:border-green-700';
+        return 'bg-green-500 text-white border-green-500 hover:bg-green-600';
       case 'rejected': 
-        return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200 dark:bg-red-900 dark:text-red-100 dark:border-red-700';
+        return 'bg-red-500 text-white border-red-500 hover:bg-red-600';
       case 'under_review': 
-        return 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200 dark:bg-orange-900 dark:text-orange-100 dark:border-orange-700';
+        return 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600';
       case 'pending': 
-        return 'bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600';
+        return 'bg-black text-white border-black hover:bg-gray-800';
       default: 
-        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700';
+        return 'bg-gray-500 text-white border-gray-500 hover:bg-gray-600';
     }
   };
 
