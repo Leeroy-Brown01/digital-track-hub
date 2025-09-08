@@ -197,11 +197,11 @@ export default function AdminDashboard() {
     }
   };
 
-  const downloadDocument = async (document: any) => {
+  const downloadDocument = async (doc: any) => {
     try {
       const { data, error } = await supabase.storage
         .from('application-documents')
-        .download(document.storage_path);
+        .download(doc.storage_path);
 
       if (error) throw error;
 
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
       const url = URL.createObjectURL(data);
       const a = document.createElement('a');
       a.href = url;
-      a.download = document.file_name;
+      a.download = doc.file_name;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
