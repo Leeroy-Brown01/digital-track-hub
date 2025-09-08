@@ -338,6 +338,21 @@ export default function AdminDashboard() {
     }
   };
 
+  const getStatusBadgeStyles = (status: string) => {
+    switch (status) {
+      case 'approved': 
+        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:border-green-700';
+      case 'rejected': 
+        return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200 dark:bg-red-900 dark:text-red-100 dark:border-red-700';
+      case 'under_review': 
+        return 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200 dark:bg-orange-900 dark:text-orange-100 dark:border-orange-700';
+      case 'pending': 
+        return 'bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600';
+      default: 
+        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700';
+    }
+  };
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'admin': return 'destructive';
@@ -618,7 +633,7 @@ export default function AdminDashboard() {
                                   </p>
                                 )}
                               </div>
-                              <Badge variant={getStatusVariant(application.status)}>
+                              <Badge className={getStatusBadgeStyles(application.status)}>
                                 {application.status.replace('_', ' ')}
                               </Badge>
                             </div>
