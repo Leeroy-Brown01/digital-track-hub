@@ -435,75 +435,75 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-gray-100 text-gray-900 border-gray-300 ${expandedStatuses.has('pending') ? 'ring-2 ring-gray-500' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-bronze text-deep-forest border-deep-forest/20 ${expandedStatuses.has('pending') ? 'ring-2 ring-deep-forest' : ''}`}
             onClick={() => toggleStatusExpansion('pending')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between text-gray-900">
+              <CardTitle className="text-sm flex items-center justify-between text-deep-forest">
                 Pending
                 {expandedStatuses.has('pending') ? 
-                  <ChevronDown className="h-3 w-3 text-gray-700" /> : 
-                  <ChevronRight className="h-3 w-3 text-gray-700" />
+                  <ChevronDown className="h-3 w-3 text-deep-forest" /> : 
+                  <ChevronRight className="h-3 w-3 text-deep-forest" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{stats.pending}</div>
-              <p className="text-xs text-gray-600">Click to view pending</p>
+              <div className="text-2xl font-bold text-deep-forest">{stats.pending}</div>
+              <p className="text-xs text-deep-forest/70">Click to view pending</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-orange-500 text-white border-orange-600 ${expandedStatuses.has('under_review') ? 'ring-2 ring-orange-700' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-alabaster text-deep-forest border-bronze/20 ${expandedStatuses.has('under_review') ? 'ring-2 ring-bronze' : ''}`}
             onClick={() => toggleStatusExpansion('under_review')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between text-white">
+              <CardTitle className="text-sm flex items-center justify-between text-deep-forest">
                 Under Review
                 {expandedStatuses.has('under_review') ? 
-                  <ChevronDown className="h-3 w-3 text-white" /> : 
-                  <ChevronRight className="h-3 w-3 text-white" />
+                  <ChevronDown className="h-3 w-3 text-bronze" /> : 
+                  <ChevronRight className="h-3 w-3 text-bronze" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.under_review}</div>
-              <p className="text-xs text-orange-100">Click to view reviewing</p>
+              <div className="text-2xl font-bold text-bronze">{stats.under_review}</div>
+              <p className="text-xs text-deep-forest/60">Click to view reviewing</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-green-500 text-white border-green-600 ${expandedStatuses.has('approved') ? 'ring-2 ring-green-700' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-deep-forest text-alabaster border-bronze/30 ${expandedStatuses.has('approved') ? 'ring-2 ring-bronze' : ''}`}
             onClick={() => toggleStatusExpansion('approved')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between text-white">
+              <CardTitle className="text-sm flex items-center justify-between text-alabaster">
                 Approved
                 {expandedStatuses.has('approved') ? 
-                  <ChevronDown className="h-3 w-3 text-white" /> : 
-                  <ChevronRight className="h-3 w-3 text-white" />
+                  <ChevronDown className="h-3 w-3 text-bronze" /> : 
+                  <ChevronRight className="h-3 w-3 text-bronze" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.approved}</div>
-              <p className="text-xs text-green-100">Click to view approved</p>
+              <div className="text-2xl font-bold text-bronze">{stats.approved}</div>
+              <p className="text-xs text-alabaster/70">Click to view approved</p>
             </CardContent>
           </Card>
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-red-500 text-white border-red-600 ${expandedStatuses.has('rejected') ? 'ring-2 ring-red-700' : ''}`}
+            className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 bg-bronze text-deep-forest border-deep-forest/20 ${expandedStatuses.has('rejected') ? 'ring-2 ring-deep-forest' : ''}`}
             onClick={() => toggleStatusExpansion('rejected')}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between text-white">
+              <CardTitle className="text-sm flex items-center justify-between text-deep-forest">
                 Rejected
                 {expandedStatuses.has('rejected') ? 
-                  <ChevronDown className="h-3 w-3 text-white" /> : 
-                  <ChevronRight className="h-3 w-3 text-white" />
+                  <ChevronDown className="h-3 w-3 text-deep-forest" /> : 
+                  <ChevronRight className="h-3 w-3 text-deep-forest" />
                 }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.rejected}</div>
-              <p className="text-xs text-red-100">Click to view rejected</p>
+              <div className="text-2xl font-bold text-deep-forest">{stats.rejected}</div>
+              <p className="text-xs text-deep-forest/70">Click to view rejected</p>
             </CardContent>
           </Card>
           <Card 
@@ -545,7 +545,7 @@ export default function AdminDashboard() {
               const isExpanded = expandedStatuses.has(status);
               if (!isExpanded) return null;
               
-              const statusApplications = status === 'total' ? applications : applications.filter(app => app.status === status && !app.assigned_reviewer_id);
+              const statusApplications = status === 'total' ? applications : applications.filter(app => app.status === status);
               const filteredApps = statusApplications.filter(app => {
                 const matchesSearch = app.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                      app.profiles?.full_name.toLowerCase().includes(searchTerm.toLowerCase());
