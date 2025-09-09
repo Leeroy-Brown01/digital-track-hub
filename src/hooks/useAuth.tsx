@@ -106,11 +106,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
     setProfile(null);
     
-    // Sign out from Supabase (don't await to avoid delays)
-    supabase.auth.signOut();
+    // Clear all Supabase auth data from localStorage
+    localStorage.removeItem('sb-vrfifveddfjrcnfbdcwj-auth-token');
+    localStorage.clear();
     
-    // Force immediate redirect without waiting
-    window.location.href = '/';
+    // Sign out from Supabase and force immediate redirect
+    supabase.auth.signOut().then(() => {
+      window.location.href = '/';
+    });
+    
+    // Fallback redirect in case signOut fails
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 100);
   };
 
   const value = {
