@@ -147,24 +147,34 @@ export default function ReviewerDashboard() {
   };
 
   const submitComment = async () => {
-    if (!selectedApplication || !commentText.trim()) return;
+    if (!selectedApplication || !commentText.trim() || !user?.id) {
+      toast({
+        title: "Error",
+        description: "Missing required information to submit comment",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
       const { error } = await supabase
         .from('application_comments')
         .insert({
           application_id: selectedApplication.id,
-          commenter_id: user?.id || '',
+          commenter_id: user.id,
           comment: commentText.trim()
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       // Log the activity
       await supabase
         .from('activity_logs')
         .insert({
-          user_id: user?.id,
+          user_id: user.id,
           action: 'comment_added',
           resource_type: 'application',
           resource_id: selectedApplication.id,
@@ -175,13 +185,13 @@ export default function ReviewerDashboard() {
       setShowCommentModal(false);
       toast({
         title: "Success",
-        description: "Comment added successfully"
+        description: "Comment added successfully. The applicant has been notified."
       });
     } catch (error) {
       console.error('Error adding comment:', error);
       toast({
         title: "Error",
-        description: "Failed to add comment",
+        description: `Failed to add comment: ${error.message || 'Unknown error'}`,
         variant: "destructive"
       });
     }
