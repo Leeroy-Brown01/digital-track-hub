@@ -106,11 +106,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
     setProfile(null);
     
-    // Sign out from Supabase
-    await supabase.auth.signOut();
+    // Sign out from Supabase (don't await to avoid delays)
+    supabase.auth.signOut();
     
-    // Force page reload to ensure clean state
-    window.location.replace('/');
+    // Force immediate redirect without waiting
+    window.location.href = '/';
   };
 
   const value = {
